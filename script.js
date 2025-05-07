@@ -134,7 +134,13 @@ function start() {
   undo_stack = [];
   can_undo = false;
   document.getElementById("undo").disabled = true;
-  
+
+  // Reset AI undo stack
+  ai_undo_stack = [];
+  can_ai_undo = false;
+  ai_control_mode = false;
+  document.getElementById("ai_undo").disabled = true;
+
   for (var y = 0; y < hw; ++y) {
     for (var x = 0; x < hw; ++x) {
       grid[y][x] = -1;
@@ -306,7 +312,9 @@ function show(r, c) {
 function ai_check() {
   if (game_end) {
     clearInterval(ai_check);
-  } else if (player == ai_player) {
+  } else if (player == ai_player && !ai_control_mode) {
+    // Save state before AI makes a move
+    save_ai_state();
     ai();
   } else if (show_value && !value_calculated) {
     calc_value();
@@ -454,7 +462,16 @@ function move(y, x) {
   if (player !== ai_player) {
     save_game_state();
   }
-  
+
+  if (ai_control_mode) {
+    save_ai_state();
+  }
+
+  // Reset AI control mode when player makes a move
+  if (player !== ai_player) {
+    ai_control_mode = false;
+  }
+
   for (var yy = 0; yy < hw; ++yy) {
     for (var xx = 0; xx < hw; ++xx) {
       bef_grid[yy][xx] = grid[yy][xx];
@@ -730,7 +747,13 @@ function reset() {
   undo_stack = [];
   can_undo = false;
   document.getElementById("undo").disabled = true;
-  
+
+  // Reset AI undo stack
+  ai_undo_stack = [];
+  can_ai_undo = false;
+  ai_control_mode = false;
+  document.getElementById("ai_undo").disabled = true;
+
   document.getElementById("start").disabled = false;
   var show_value_elem = document.getElementById("show_value");
   show_value_elem.disabled = false;
@@ -769,6 +792,9 @@ function reset() {
 // Add these variables at the top with other global variables
 let undo_stack = [];
 let can_undo = false;
+let ai_undo_stack = [];
+let can_ai_undo = false;
+let ai_control_mode = false;
 
 // Add this function to save the game state before a player's move
 function save_game_state() {
@@ -776,19 +802,33 @@ function save_game_state() {
     grid_copy: JSON.parse(JSON.stringify(grid)),
     player_copy: player,
     n_stones_copy: n_stones,
-    record_copy: [...record]
+    record_copy: [...record],
   };
   undo_stack.push(state);
   document.getElementById("undo").disabled = false;
   can_undo = true;
 }
 
+// Function to save AI's move state before AI makes a move
+function save_ai_state() {
+  console.log("Saving AI state");
+  let state = {
+    grid_copy: JSON.parse(JSON.stringify(grid)),
+    player_copy: player,
+    n_stones_copy: n_stones,
+    record_copy: [...record],
+  };
+  ai_undo_stack.push(state);
+  document.getElementById("ai_undo").disabled = false;
+  can_ai_undo = true;
+}
+
 // Implement the undo function
 function undo() {
   if (!can_undo || undo_stack.length === 0) return;
-  
+
   let last_state = undo_stack.pop();
-  
+
   // Restore the game state
   for (let y = 0; y < hw; ++y) {
     for (let x = 0; x < hw; ++x) {
@@ -796,19 +836,20 @@ function undo() {
       bef_grid[y][x] = -1; // Reset bef_grid to force redraw
     }
   }
-  
+
   player = last_state.player_copy;
   n_stones = last_state.n_stones_copy;
-  
+
   // Update record
   record = last_state.record_copy;
   document.getElementById("record").innerText = "";
   for (let i = 0; i < record.length; i++) {
-    let coord = String.fromCharCode(97 + record[i][1]) + 
-                String.fromCharCode(49 + record[i][0]);
+    let coord =
+      String.fromCharCode(97 + record[i][1]) +
+      String.fromCharCode(49 + record[i][0]);
     document.getElementById("record").innerText += coord;
   }
-  
+
   // Update graph if showing
   if (show_graph) {
     graph.data.labels.pop();
@@ -817,12 +858,60 @@ function undo() {
   } else if (graph_values.length > 0) {
     graph_values.pop();
   }
-  
+
   // Disable undo if no more states
   if (undo_stack.length === 0) {
     document.getElementById("undo").disabled = true;
     can_undo = false;
   }
-  
+
+  show(-1, -1);
+}
+
+// Implement the AI undo function
+function aiUndo() {
+  if (!can_ai_undo || ai_undo_stack.length === 0) return;
+
+  let last_state = ai_undo_stack.pop();
+
+  // Restore the game state
+  for (let y = 0; y < hw; ++y) {
+    for (let x = 0; x < hw; ++x) {
+      grid[y][x] = last_state.grid_copy[y][x];
+      bef_grid[y][x] = -1; // Reset bef_grid to force redraw
+    }
+  }
+
+  player = last_state.player_copy;
+  n_stones = last_state.n_stones_copy;
+
+  // Update record
+  record = last_state.record_copy;
+  document.getElementById("record").innerText = "";
+  for (let i = 0; i < record.length; i++) {
+    let coord =
+      String.fromCharCode(97 + record[i][1]) +
+      String.fromCharCode(49 + record[i][0]);
+    document.getElementById("record").innerText += coord;
+  }
+
+  // Update graph if showing
+  if (show_graph) {
+    graph.data.labels.pop();
+    graph.data.datasets[0].data.pop();
+    graph.update();
+  } else if (graph_values.length > 0) {
+    graph_values.pop();
+  }
+
+  // Disable AI undo if no more states
+  if (ai_undo_stack.length === 0) {
+    document.getElementById("ai_undo").disabled = true;
+    can_ai_undo = false;
+  }
+
+  // Enable AI control mode
+  ai_control_mode = true;
+
   show(-1, -1);
 }
