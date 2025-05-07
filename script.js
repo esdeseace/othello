@@ -130,6 +130,11 @@ const rangeOnChange_book = (e) => {
 };
 
 function start() {
+  // Reset undo stack
+  undo_stack = [];
+  can_undo = false;
+  document.getElementById("undo").disabled = true;
+  
   for (var y = 0; y < hw; ++y) {
     for (var x = 0; x < hw; ++x) {
       grid[y][x] = -1;
@@ -445,6 +450,11 @@ function calc_value() {
 }
 
 function move(y, x) {
+  // Save state before player's move (not AI's move)
+  if (player !== ai_player) {
+    save_game_state();
+  }
+  
   for (var yy = 0; yy < hw; ++yy) {
     for (var xx = 0; xx < hw; ++xx) {
       bef_grid[yy][xx] = grid[yy][xx];
@@ -716,6 +726,11 @@ function initialize_ai() {
 }
 
 function reset() {
+  // Reset undo stack
+  undo_stack = [];
+  can_undo = false;
+  document.getElementById("undo").disabled = true;
+  
   document.getElementById("start").disabled = false;
   var show_value_elem = document.getElementById("show_value");
   show_value_elem.disabled = false;
@@ -749,4 +764,65 @@ function reset() {
   graph.update();
   game_end = true;
   show(-2, -2);
+}
+
+// Add these variables at the top with other global variables
+let undo_stack = [];
+let can_undo = false;
+
+// Add this function to save the game state before a player's move
+function save_game_state() {
+  let state = {
+    grid_copy: JSON.parse(JSON.stringify(grid)),
+    player_copy: player,
+    n_stones_copy: n_stones,
+    record_copy: [...record]
+  };
+  undo_stack.push(state);
+  document.getElementById("undo").disabled = false;
+  can_undo = true;
+}
+
+// Implement the undo function
+function undo() {
+  if (!can_undo || undo_stack.length === 0) return;
+  
+  let last_state = undo_stack.pop();
+  
+  // Restore the game state
+  for (let y = 0; y < hw; ++y) {
+    for (let x = 0; x < hw; ++x) {
+      grid[y][x] = last_state.grid_copy[y][x];
+      bef_grid[y][x] = -1; // Reset bef_grid to force redraw
+    }
+  }
+  
+  player = last_state.player_copy;
+  n_stones = last_state.n_stones_copy;
+  
+  // Update record
+  record = last_state.record_copy;
+  document.getElementById("record").innerText = "";
+  for (let i = 0; i < record.length; i++) {
+    let coord = String.fromCharCode(97 + record[i][1]) + 
+                String.fromCharCode(49 + record[i][0]);
+    document.getElementById("record").innerText += coord;
+  }
+  
+  // Update graph if showing
+  if (show_graph) {
+    graph.data.labels.pop();
+    graph.data.datasets[0].data.pop();
+    graph.update();
+  } else if (graph_values.length > 0) {
+    graph_values.pop();
+  }
+  
+  // Disable undo if no more states
+  if (undo_stack.length === 0) {
+    document.getElementById("undo").disabled = true;
+    can_undo = false;
+  }
+  
+  show(-1, -1);
 }
