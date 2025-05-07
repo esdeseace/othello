@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="https://www.egaroucid.nyanyan.dev/img/favicon.ico"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@takuto_yamana" />
+    <meta property="og:title" content="Web Version Egaroucid" />
+    <meta
+      property="og:description"
+      content="Othello AI Egaroucid Free software with one of the strongest Othello AI in the world. The light version got the first place in the world."
+    />
+    <meta
+      name="description"
+      content="Othello AI Egaroucid Free software with one of the strongest Othello AI in the world. The light version got the first place in the world."
+    />
+    <link rel="stylesheet" href="style_web.css" />
+    <title>Web Version Egaroucid</title>
+  </head>
+
+  <body>
+    <!-- <div class="menu_bar"> -->
+    <!-- <div class="menu_button"><a class="menu_a" href="https://www.egaroucid.nyanyan.dev/en/">Home</a></div><div class="menu_button"><a class="menu_a" href="https://www.egaroucid.nyanyan.dev/en/download/">Download</a></div><div class="menu_button"><a class="menu_a" href="https://www.egaroucid.nyanyan.dev/ja/usage/" target="_blank" el=”noopener noreferrer”>Usage (Japanese)</div></a> -->
+    <!-- <div class="menu_button"><a class="menu_a" href="https://www.egaroucid.nyanyan.dev/en/console/">Console Version</a></div><div class="menu_button"><a class="menu_a" href="https://www.egaroucid.nyanyan.dev/en/web/">Web Version</a></div><div class="menu_button"><a class="menu_a" href="https://www.egaroucid.nyanyan.dev/en/technology/">Technology</a></div></div> -->
+    <div class="box">
+      <!-- <div class="util_wrapper"><a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-text="Web Version Egaroucid - One of the strongest Othello AI in the world" data-url="https://www.egaroucid.nyanyan.dev/en/web" data-hashtags="egaroucid" data-related="takuto_yamana" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>  -->
+      <!-- <a font-size="1.5em" href="https://www.egaroucid.nyanyan.dev/ja/web">日本語</a>  -->
+      <!-- </div> -->
+
+      <h1>Othello</h1>
+
+      <div align="center" style="line-height: 1.5">
+        <span id="ai_info">AI Initializing...</span
+        ><span id="ai_message"
+          ><br />If loading doesn't finish in 10 seconds, please reload.</span
+        >
+      </div>
+
+      <div align="center">
+        <table class="settings_table">
+          <tr class="settings_table">
+            <td class="settings_table">
+              <label
+                ><input
+                  checked
+                  type="radio"
+                  class="radio_size"
+                  name="ai_player"
+                  value="white_first_ai"
+                  id="white_first_ai"
+                />
+                <span class="setting">AI Đen: đi trước</span></label
+              >
+            </td>
+            <td class="settings_table">
+              <label
+                ><input
+                  type="radio"
+                  class="radio_size"
+                  name="ai_player"
+                  value="black_first_ai"
+                  id="black_first_ai"
+                />
+                <span class="setting">AI Trắng: đi trước</span></label
+              >
+            </td>
+          </tr>
+          <tr class="settings_table">
+            <td class="settings_table">
+              <label
+                ><input
+                  type="radio"
+                  class="radio_size"
+                  name="ai_player"
+                  value="black_first"
+                  id="black_first"
+                />
+                <span class="setting">AI Đen: đi sau</span></label
+              >
+            </td>
+            <td class="settings_table">
+              <label
+                ><input
+                  type="radio"
+                  class="radio_size"
+                  name="ai_player"
+                  value="white_first"
+                  id="white_first"
+                />
+                <span class="setting">AI Trắng: đi sau</span></label
+              >
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div align="center">
+        <label
+          ><span class="setting">Sức mạnh</span
+          ><input
+            type="range"
+            id="ai_level"
+            min="0"
+            max="15"
+            step="1"
+            value="10" /></label
+        ><span class="setting" id="ai_level_label"></span>
+      </div>
+
+      <div align="center">
+        <table class="settings_table hidden_class">
+          <tr class="settings_table">
+            <td class="settings_table">
+              <label
+                ><input type="checkbox" id="show_value" unchecked /><span
+                  class="setting"
+                  >Hint</span
+                ></label
+              >
+            </td>
+            <td class="settings_table">
+              <label
+                ><input type="checkbox" id="show_graph" /><span class="setting"
+                  >Graph</span
+                ></label
+              >
+            </td>
+          </tr>
+          <tr class="settings_table">
+            <td class="settings_table">
+              <label
+                ><input type="checkbox" id="show_legal" checked /><span
+                  class="setting"
+                  >Moves</span
+                ></label
+              >
+            </td>
+            <td class="settings_table">
+              <label
+                ><input type="checkbox" id="auto_pass" /><span class="setting"
+                  >Auto-Pass</span
+                ></label
+              >
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div align="center">
+        <div class="buttons">
+          <input
+            type="submit"
+            class="button_game button_undo"
+            value="Undo"
+            onclick="undo()"
+            id="undo"
+            disabled
+          />
+          <input
+            type="submit"
+            class="button_game button_pass"
+            value="Pass"
+            onclick="pass()"
+            id="pass"
+            disabled
+          />
+          <input
+            type="submit"
+            class="button_game button_start"
+            value="Start"
+            onclick="start()"
+            id="start"
+            disabled
+          />
+          <input
+            type="submit"
+            class="button_game button_reset"
+            value="Reset"
+            onclick="reset()"
+            id="reset"
+            disabled
+          />
+        </div>
+      </div>
+
+      <div class="popup" id="js-popup">
+        <div class="popup-inner">
+          <p align="center" class="sub_title" id="result_text"></p>
+          <img
+            class="image"
+            id="game_result"
+            width="80%"
+            height="auto"
+            style="aspect-ratio: 1.06"
+          />
+          <p align="center" class="hidden" id="tweet_result"></p>
+          <p align="center" class="text">You can save this picture</p>
+          <p align="center" class="text">Click black area to close</p>
+        </div>
+        <div class="black-background" id="js-black-bg"></div>
+      </div>
+
+      <div class="div_main">
+        <table class="table_board" align="center" id="table_board"></table>
+        <table class="status" id="status" align="center">
+          <tr>
+            <td class="status_cell"><span class="state_blank"></span></td>
+            <td class="status_cell"><span class="black_stone"></span></td>
+            <td class="status_char"><span class="state_blank">2</span></td>
+            <td class="status_char"><span class="state_blank">-</span></td>
+            <td class="status_char"><span class="state_blank">2</span></td>
+            <td class="status_cell"><span class="white_stone"></span></td>
+            <td class="status_cell"><span class="state_blank"></span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div id="info" class="info hidden_class">
+        <div class="sub_title">Game Information</div>
+        <div class="sub_sub_title">Graph</div>
+        <div class="chart" id="chart_container">
+          <canvas id="graph"></canvas>
+        </div>
+        <!-- <div class="sub_sub_title">Transcript</div> -->
+        <div class="record" id="record"></div>
+      </div>
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+      <script src="script.js"></script>
+    </div>
+  </body>
+</html>
