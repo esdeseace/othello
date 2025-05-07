@@ -316,6 +316,14 @@ label {
     background-color: #d32f2f;
 }
 
+.button_ai_undo {
+    background-color: #9C27B0; /* Purple */
+}
+
+.button_ai_undo:hover {
+    background-color: #7B1FA2;
+}
+
 .button_game:disabled {
     background-color: #cccccc;
     color: #666666;
